@@ -1,0 +1,21 @@
+{
+  "name": "PC Assistant",
+  "description": "PC Assistant",
+  "type": "certified",
+  "launch_path": "/index.html",
+  "developer": {
+    "name": "Jim",
+    "url": "https://www.acadine.com"
+  },
+  "permissions": {
+    "tcp-socket": {},
+    "device-storage:sdcard": {
+      "access": "readwrite"
+    },
+    "wifi-manage":{}
+  },
+  "icons": {
+    "128": "/style/icons/icon.png"
+  },
+  "orientation": "default"
+}
