@@ -11,16 +11,16 @@
 'use strict';
 
 /** True if debugging output is enabled, false otherwise. */
-var DEBUG = true; // non-const *only* so tweakable in server tests
-var DEBUG_LOG = true;
+var DEBUG = false; // non-const *only* so tweakable in server tests
+var DEBUG_LOG = false;
 
 /** True if debugging output should be timestamped. */
 var DEBUG_TIMESTAMP = false; // non-const so tweakable in server tests
 
-var DUMP_REQUEST_HEADER = true;
+var DUMP_REQUEST_HEADER = false;
 var DUMP_REQUEST_BODY = false;
-var DUMP_RESPONSE_HEADER = true;
-var DUMP_RESPONSE_BODY = true;
+var DUMP_RESPONSE_HEADER = false;
+var DUMP_RESPONSE_BODY = false;
 var DUMP_MESSAGE_TIMESTAMP = false;
 
 /**
@@ -42,6 +42,18 @@ function NS_ASSERT(cond, msg)
 
     throw 'Cr.NS_ERROR_ABORT';
   }
+}
+
+function Uint8ArrayToStr(buf) {
+    var out, i, len, c;
+    var char2, char3;
+
+    out = "";
+    if (buf) {
+      out += String.fromCharCode.apply(null, new Uint8Array(buf));
+    }
+
+    return out;
 }
 
 /** Constructs an HTTP error object. */
@@ -1067,7 +1079,7 @@ RequestReader.prototype =
     {
       // log('[' + '_onData' + '] ' +'received ' + evt.data.byteLength +
       // ' bytes data');
-      //log('[' + '_onData' + '] ' +'evt: ' + JSON.stringify(evt));
+      // log('[' + '_onData' + '] ' +'evt: ' + JSON.stringify(evt));
 
       that._data.appendBytes(new Uint8Array(evt.data));
       that._onInputStreamReady();
@@ -3284,27 +3296,8 @@ Response.prototype =
   _dumpBody: function()
   {
     var dumpStr = '<response_body>\n';
-    var getBinaryString = function(uint8array)
-    {
-      var arr = [];
-      var str = '';
-      var i;
-      for (i = 0; i < uint8array.length; i++)
-      {
-        var s = '0' + uint8array[i].toString(16);
 
-        arr.push(s.substring(s.length - 2));
-      }
-
-      for (i = 0; i < ((arr.length + 15) / 16); i++)
-      {
-        str += arr.slice(i * 16, i * 16 + 16).join(' ') + '\n';
-      }
-
-      return str;
-    };
-
-    dumpStr += getBinaryString(this._bodyInputStream.data);
+    dumpStr += Uint8ArrayToStr(this._bodyInputStream.data);
     dumpStr += '\n</response_body>';
     console.log('[' + '_ensureAlive' + '] ' +dumpStr);
   }
@@ -3649,27 +3642,7 @@ Request.prototype =
   _dumpBody: function()
   {
     var dumpStr = '<request_body>\n';
-    var getBinaryString = function(uint8array)
-    {
-      var arr = [];
-      var str = '';
-      var i;
-      for (i = 0; i < uint8array.length; i++)
-      {
-        var s = '0' + uint8array[i].toString(16);
-
-        arr.push(s.substring(s.length - 2));
-      }
-
-      for (i = 0; i < ((arr.length + 15) / 16); i++)
-      {
-        str += arr.slice(i * 16, i * 16 + 16).join(' ') + '\n';
-      }
-
-      return str;
-    };
-
-    dumpStr += getBinaryString(this._bodyInputStream.data);
+    dumpStr += Uint8ArrayToStr(this._bodyInputStream.data);
     dumpStr += '\n</request_body>';
     console.log(dumpStr);
   }
